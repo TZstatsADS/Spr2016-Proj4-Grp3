@@ -1,0 +1,218 @@
+---
+title: "project4"
+author: "Yuchen Shi (ys2901)"
+date: "April 4, 2016"
+output: html_document
+---
+## Install the package
+
+```{r}
+library(data.table)
+library(dplyr)
+library(digest)
+library(RCurl)
+library(rvest)
+library(tidyr)
+library(omdbapi)
+library(pbapply)
+```
+
+## Test dataset
+```{r}
+movieList =cbind(c("B001OGWY1W","B001KZG99A","B004C3DLJ8","B0054NRPMO","B000XSEPYQ"),c(2,3,4,5,3))
+movielist = matrix(movieList,byrow = F,nrow = 5)
+```
+
+## Setp 1:Find common taste user 
+
+# Input:Movie list and related scores
+# Output:Usful similar Viewer ID and their similarities
+
+```{r}
+movie<- fread("/Users/Arsenal4ever/Desktop/moviescsv2.csv")
+# find useful viewer
+usefuluser <-function(inputMovie){
+        # find Viewer with who watched ast least two the same movie
+        similarViewer = movie%>%
+        filter(product_productid %in% inputMovie[,1])%>%
+        group_by(review_userid)%>%
+        filter(n()>1)%>%
+        summarize(n=n())
+        
+        # find Strange Viewer 
+        strangeReviewer = (movie%>%
+        filter(review_userid %in% similarViewer$review_userid)%>%
+        group_by(review_userid)%>%
+        filter(n()<=2340)%>%
+        summarize(n=n()))$review_userid
+        
+        # get useful viewer 
+        usefulReviewer = subset(similarViewer$review_userid, !(similarViewer$review_userid %in% strangeReviewer))
+        usefulReviewer
+}
+
+# create score matrix 
+scoreCreater = function(commonMatrix,inputMovie,usefulReviewer){
+        useScore = matrix(0,nrow = length(usefulReviewer), ncol = length(inputMovie))
+        #create score matrix: row is uniqueID, column is movie list
+        for (j in 1:length(inputMovie)){
+            movieSet = commonMatrix%>%filter(product_productid == inputMovie[j])
+            dups <- duplicated(movieSet$review_userid) == FALSE
+            movieSet <- movieSet[dups,]
+                for (i in 1:length(usefulReviewer)){
+                        ID = usefulReviewer[i]
+                        index = which(ID == movieSet$review_userid,TRUE)
+                        if (length(index) != 0) useScore[i,j] = movieSet$review_score[index]
+                }
+        }
+        useScore
+}
+
+# find their taste
+tasteFinder <-function(movielist){
+        #get unique ID for useful Viewer
+        uniqueID = usefuluser(movielist)
+        #get score set for useful Viewer
+        scoreSet=movie%>%
+        filter(review_userid %in% uniqueID)
+        scoreSet = scoreSet%>%
+                filter(product_productid %in% movielist[,1])
+        #create score matrix 
+        socreMatrix=scoreCreater(scoreSet,movielist[,1],uniqueID)
+        #calculate similarity
+        similarity = vector()
+        for(i in 1:nrow(socreMatrix)){
+                index = which(socreMatrix[i,] == 0)
+                similarity = cbind(similarity,1/dist(rbind(socreMatrix[i,][-index],movielist[,2][-index])))
+        }
+        similarity
+}
+```
+
+## Step 2: Find similar users' movie score matrix (excluding input movies and similar products)
+
+# Input: Useful userid 
+# Output: movie score matrix
+
+```{r}
+scoreMatrix = function(userID,similarity){
+        # find unique movie ID
+        uniqueMovie = movie%>%
+        filter(review_userid %in% userID)%>%
+        group_by(product_productid)%>%
+        filter(n()>=5)%>%
+        summarize(n=n())
+        movieID = uniqueMovie$product_productid
+        
+        # find all useful observations
+        obs = movie%>%
+        filter(review_userid %in% userID)
+        # make more variables in obs 
+        obs$nu = as.numeric(lapply(obs$review_helpfulness, function(x) as.numeric(strsplit(x,"/")[[1]][1])))
+        obs$de = as.numeric(lapply(obs$review_helpfulness, function(x) as.numeric(strsplit(x,"/")[[1]][2])))
+        obs$log = log(obs$nu+1)
+        obs$adj = obs$log*((obs$nu+100)/(obs$de+100))
+        obs$adj = obs$adj*obs$review_score 
+        
+        # filter movie based on score
+        rankVector = vector()
+        for(i in 1:length(movieID)){
+                meanVector = vector()
+                movieSet = obs%>%
+                filter(product_productid == movieID[i])
+                meanVector=cbind(mean(movieSet$review_score),movieID[i])
+                rankVector = rbind(rankVector,meanVector)
+        }
+        rankVector = data.frame(rankVector)
+        colnames(rankVector) = c("score","productID")
+        x =rankVector%>%arrange(desc(as.numeric(score)))
+        
+        # filter based on number of comments 
+        rankVector = vector()
+        for(i in 1:length(movieID)){
+                meanVector = vector()
+                movieSet = obs%>%
+                filter(product_productid == movieID[i])
+                meanVector=cbind(length(movieSet$review_score),movieID[i])
+                rankVector = rbind(rankVector,meanVector)
+        }
+        rankVector = data.frame(rankVector)
+        colnames(rankVector) = c("count","productID")
+        y = rankVector%>%arrange(desc(count))
+        
+        # filter based on both 
+        newlist = y[1:round(0.1*dim(y)[1]),]
+        newmovie = obs%>%filter(product_productid %in% newlist[,2])
+        new = vector()
+        for(i in 1:length(movieID)){
+                meanVector = vector()
+                movieSet = obs%>%
+                filter(product_productid == movieID[i])
+                meanVector=cbind(mean(movieSet$review_score),movieID[i])
+                new = rbind(new,meanVector)
+        }
+        new = data.frame(new)
+        colnames(new) = c("score","productID")
+        z = new%>%arrange(desc(score))
+        
+        # get the unique movie from these three conditions
+        three = c(as.vector(x$productID[1:100]),as.vector(y$productID[1:100]),as.vector(z$productID[1:100]))
+        dups <- duplicated(three) == FALSE
+        three <- three[dups]
+        
+        # delete all movies with key words related to the chosen movies
+        #
+        #
+        #
+        
+        finalMovie = obs %>% filter(obs$product_productid %in% three)
+        finalscoreMatrix = matrix(rep(0,length(userID)*length(three)),nrow =length(userID))
+        for(i in 1:length(userID)){
+                for(j in 1:length(three)){
+                        subset = obs%>%filter(obs$product_productid == three[j] & 
+                                               obs$review_userid == userID[i])
+                                
+                        subset = subset[1,]
+                        finalscoreMatrix[i,j] = subset$review_score
+                }
+        }
+        final_adj=finalscoreMatrix*matrix(rep(similarity,dim(finalscoreMatrix)[2]),byrow = F,nrow = dim(finalscoreMatrix)[1])
+        return(list(scocrematrix = final_adj,movielist =three))
+}
+
+```
+
+## Step 3: recommend movies
+
+# Input: score matrix
+# Output: movies
+```{r}
+recommend = function(scorematrix,movielist){
+        
+        scorematrix = colMeans(scorematrix,na.rm = T)
+        highScore = sort(scorematrix,decreasing = T)[1:20]
+        dups = duplicated(highScore) == FALSE
+        highSocre = highScore[dups]
+        recomend = vector()
+        
+        for(i in 1:length(highSocre)){
+        recomend = cbind(recomend,movielist[which(scorematrix == highSocre[i])])
+        }
+        recomend
+}
+```
+
+## Main method
+
+```{r}
+# find users watched similar movies
+userID = usefuluser(movielist)
+# find how much they are similar to each other
+similarity = tasteFinder(movielist)
+# get the score matrix of other movies they watched (filtered by socres and comments)
+scoreMatrix = scoreMatrix(userID,similarity)
+# recommend other movies they watched based on certain criteria
+movieRecommend = recommend(scoreMatrix$scocrematrix,scoreMatrix$movielist)
+```
+
+
