@@ -1,4 +1,4 @@
-# Project 4 Collective intelligence 
+# Project 4 Recommendation System: NEXTFLIX! 
 ### Mining Amazon Movies Reviews
 
 Term: Spring 2016
