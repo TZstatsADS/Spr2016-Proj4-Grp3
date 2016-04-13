@@ -82,19 +82,26 @@ westerns_kw = "Westerns"
 #2. User's Input Process
 ```{r}
 #Input testing movie list and filter to get the "favourable" movies (score >=3)
-movieList = cbind(c("B001OGWY1W","B001KZG99A","B004C3DLJ8","B0054NRPMO","B000XSEPYQ"),c(2,3,4,5,3))
+movieList = cbind(c("B003QTWR08","B0055B7K7A","B00AHSLU2C","B0046B8GEQ","B004C3DLJ8","B001OGWY1W","B001KZG99A","B005ZB91KY","B003KJF2WE","B002EDH0FE"),c(4,5,4,5,3,5,4,3,3,4))
 movieList = movieList[,1][movieList[,2] >= 3]
 #Create a input movie list's genres matrix
 freq_table = matrix(rep(0, 27*length(movieList)), nrow = length(movieList), ncol = 27)
 #freq_table[,1] = movieList
 for (i in 1:length(movieList)) {
   #Get Amazon Genres from Amazon website
-  ASIN.inq = movieList[i]
-  movie1<- read_html(paste("http://www.amazon.com/exec/obidos/ASIN/",
-                      ASIN.inq, sep=""))
-  categoryList = movie1 %>% html_node("#dv-center-features div td") %>% html_text() %>% strsplit(",")
+  tryCatch(
+    {
+      ASIN.inq = movieList[i]
+      movie1<- read_html(paste("http://www.amazon.com/exec/obidos/ASIN/",ASIN.inq, sep=""))
+      categoryList = movie1 %>% html_node("#dv-center-features div td") %>% html_text() %>% strsplit(",")
+    },
+    error=function(cond) {
+      print("Wrong at")
+      print(i)
+    }
+    )
   categoryList=lapply(categoryList, function(x) str_trim(x,side='both'))
-  
+  print(categoryList)
   for (j in 1:length(categoryList[[1]])) {
     #Get the Amazon Genres to our genres matrix
     if (categoryList[[1]][j] == act_adv_kw) {freq_table[i,1] = 1}
@@ -133,56 +140,63 @@ input_f = colSums(freq_table) / sum(colSums(freq_table))
 #3. Similarity
 ```{r}
 #Pre-filter some observations
-review.table.join.filter = filter(review.table.join, act_adv_f>input_f[1]-0.1 & aac_f>input_f[1]-0.1 &
-                                    animation_f>input_f[1]-0.1 & anime_f>input_f[1]-0.1 &
-                                    box_f>input_f[1]-0.1 & classics_f>input_f[1]-0.1 & comedy_f>input_f[1]-0.1 & 
-                                    doc_f>input_f[1]-0.1 & drama_f>input_f[1]-0.1 & edu_f>input_f[1]-0.1 &
-                                    ex_f>input_f[1]-0.1 & faith_f>input_f[1]-0.1 & fantasy_f>input_f[1]-0.1 &
-                                    foreign_f>input_f[1]-0.1 & gay_f>input_f[1]-0.1 & holiday_f > input_f[1]-0.1 &
-                                    horror_f>input_f[1]-0.1 &indie_f>input_f[1]-0.1 &family_f>input_f[1]-0.1 &
-                                    war_f>input_f[1]-0.1 & music_f>input_f[1]-0.1 & thrill_f>input_f[1]-0.1 &
-                                    romance_f>input_f[1]-0.1 & sci_fi_f>input_f[1]-0.1 & special_f>input_f[1]-0.1 &
-                                    sports_f>input_f[1]-0.1 & westerns_f>input_f[1]-0.1)
-
+review.table.join = as.data.frame(review.table.join)
+review.table.join.filter = filter(review.table.join, act_adv_f>=input_f[1]/10 & aac_f>=input_f[2]/10 &
+                                    animation_f>=input_f[3]/10 & anime_f>=input_f[4]/10 &
+                                    box_f>=input_f[5]/10 & classics_f>=input_f[6]/10 & comedy_f>=input_f[7]/10 & 
+                                    doc_f>=input_f[8]/10 & drama_f>=input_f[9]/10 & edu_f>=input_f[10]/10 &
+                                    ex_f>=input_f[11]/10 & faith_f>=input_f[12]/10 & fantasy_f>=input_f[13]/10 &
+                                    foreign_f>=input_f[14]/10 & gay_f>=input_f[15]/10 & holiday_f >= input_f[16]/10 &
+                                    horror_f>=input_f[17]/10 &indie_f>=input_f[18]/10 &family_f>=input_f[19]/10 &
+                                    war_f>=input_f[20]/10 & music_f>=input_f[21]/10 & thrill_f>=input_f[22]/10 &
+                                    romance_f>=input_f[23]/10 & sci_fi_f>=input_f[24]/10 & special_f>=input_f[25]/10 &
+                                    sports_f>=input_f[26]/10 & westerns_f>=input_f[27]/10)
+#nrow(review.table.join.filter) #nrow=14223
 review = as.data.frame(review.table.join.filter)
 review.table.index = review[,1:2]
 review.table.f = review[,3:29]
 ```
 
 ```{r}
-trial = review.table.f[1:100,]
 similarity = matrix(,ncol=2)
 for(i in 1:dim(review.table.f)[1]){
   a = cbind(i,as.numeric(1/dist(rbind(as.numeric(review.table.f[i,]),input_f))))
   similarity = rbind(similarity,a) 
 }
+#Delete the first row since it's NA
+similarity1 = similarity[2:nrow(similarity),]
+#Delete the wrong product ids
+index = which(is.na(as.numeric(review.table.index$product_productid)))
+similarity2 = similarity1[index,]
+#Sort the distance
+similarity3 <- similarity2[order(-similarity2[,2]),]
 
-similarity <- similarity[order(similarity[,2]),]
+#Delete the bad movies
+bad1 <- read.csv("movie_littlsuck.csv")
+bad2 <- read.csv("movie_worst.csv")
+bad <- c(bad1$product_productid, bad2$product_productid)
+#Function to find bad movie list
+goodindex <- vector()
+for (i in 1:nrow(similarity2)) {
+  if (!(length(which(similarity2[i,2] == bad)))) {
+    goodindex = c(goodindex,i)
+  }
+}
+similarity4 = similarity3[goodindex,]
 
-review.table.index[which.max(similarity,200),]
+list1 = review.table.index[similarity4[1:200,1],]
+final_list = filter(list1, review.count > 20)
 ```
 
 ```{r}
-find_title <- function(movie_id) {
-  ASIN.inq = movie_id
-  movie1 <- html(paste("http://www.amazon.com/exec/obidos/ASIN/",ASIN.inq, sep=""))
-  title <- movie1 %>% html_node("title") %>% html_text()
-}
-final_list = vector()
-for (movie in similarity) {
-  ASIN.inq = movie
-  movie1 <- html(paste("http://www.amazon.com/exec/obidos/ASIN/",ASIN.inq, sep=""))
-  title1 <- movie1 %>% html_node("title") %>% html_text()
-  match <- substr(title,1,3)
-  while (final_list < 5) {
-
-    
-    movie2 <- 
+#Delete the duplicated movies
+duplicate <- vector()
+for (i in 2:nrow(final_list)) {
+  if (final_list$review.count[i] == final_list$review.count[i-1]) {
+    duplicate = c(duplicate,i)
   }
 }
-  
-  
-  
-
-
+final_list_unique = final_list[-duplicate,]
+#Choose the top 5 movies to recommend
+head(final_list_unique,5)
 ```
