@@ -15,6 +15,7 @@ library(rvest)
 library(tidyr)
 library(omdbapi)
 library(pbapply)
+library(devtools)
 ```
 
 ## Test dataset
@@ -93,6 +94,90 @@ tasteFinder <-function(movielist){
 
 # Input: Useful userid 
 # Output: movie score matrix
+```{r}
+bad = function(movie){
+        attach(movie)
+        reviewscore5=ifelse(review_score==5, 1,0)
+        reviewscore4=ifelse(review_score==4, 1,0)
+        reviewscore3=ifelse(review_score==3, 1,0)
+        reviewscore2=ifelse(review_score==5, 2,0)
+        reviewscore1=ifelse(review_score==1, 1,0)
+        movie<-cbind(movie,reviewscore1,reviewscore2,reviewscore3,reviewscore4,reviewscore5)
+
+        movie_pytransaction=movie%>%
+        group_by(product_productid)%>%
+        summarize(
+                reviewCt=n(),
+                reviewAvg=mean(review_score, na.rm=T),
+                reviewscore1ct=sum(reviewscore1),
+                reviewscore5ct=sum(reviewscore5)
+                )%>%
+        mutate(reviewscore1per=reviewscore1ct/reviewCt)%>%
+        mutate(reviewscore5per=reviewscore5ct/reviewCt)%>%
+        filter(reviewscore1per<0.45)%>%
+        filter(reviewscore1per>0.3)%>%
+        filter(reviewscore5per<0.5)%>%
+        filter(reviewscore5per>0.3)%>%
+        arrange(desc(reviewCt))
+
+        movie_littlsuck=movie%>%
+        group_by(product_productid)%>%
+        summarize(
+                reviewCt=n(),
+                reviewAvg=mean(review_score, na.rm=T),
+                reviewscore3ct=sum(reviewscore3),
+                reviewscore1ct=sum(reviewscore1)
+        )%>%
+        mutate(reviewscore3ct=reviewscore3ct/reviewCt)%>%
+        mutate(reviewscore1ct=reviewscore1ct/reviewCt)%>%
+        filter(reviewscore3ct<0.45)%>%
+        filter(reviewscore3ct>0.3)%>%
+        filter(reviewscore1ct<0.45)%>%
+        filter(reviewscore1ct>0.3)%>%
+        arrange(desc(reviewCt))
+
+
+        movie_worst=movie%>%
+        group_by(product_productid)%>%
+        summarize(
+                reviewCt=n(),
+                reviewAvg=mean(review_score, na.rm=T),
+                reviewscore1ct=sum(reviewscore1)
+        )%>%
+        mutate(reviewscore1ct=reviewscore1ct/reviewCt)%>%
+        filter(reviewscore1ct>0.5)%>%
+        arrange(desc(reviewCt))
+        detach(movie)
+        badmovie = cbind(movie_worst$product_productid,movie_littlsuck$product_productid)
+        badmovie
+}
+```
+
+```{r}
+# delete all old movies
+delete = function(movieID,movie){
+        obs = movie%>%filter(product_productid%in%movieID)
+        newmovieList = vector()
+        for(i in 1:length(movieID)){
+                movie_a = movie%>%filter(product_productid == movieID[i])
+                if (min(movie_a$review_time) <= 946684800) next
+                newmovieList = cbind(movieID[i],newmovieList)
+        }
+        newmovieList
+}
+```
+
+```{r}
+delete = function(movielist,movie){
+                movie_a = movie%>%filter(product_productid == movielist)
+                 if (min(movie_a$review_time) >= 946684800){
+                         newmovieList = movielist
+                 }else{
+                         newmovieList = 0 
+                 }
+}
+a = lapply(movieID,function(x) delete(x,movie))
+```
 
 ```{r}
 scoreMatrix = function(userID,similarity){
@@ -107,11 +192,14 @@ scoreMatrix = function(userID,similarity){
         # find all useful observations
         obs = movie%>%
         filter(review_userid %in% userID)
+        # delete all the movies with illegal productid
+        index = which(is.na(as.numeric(obs$product_productid)))
+        obs = obs[index,]
         # make more variables in obs 
         obs$nu = as.numeric(lapply(obs$review_helpfulness, function(x) as.numeric(strsplit(x,"/")[[1]][1])))
         obs$de = as.numeric(lapply(obs$review_helpfulness, function(x) as.numeric(strsplit(x,"/")[[1]][2])))
-        obs$log = log(obs$nu+1)
-        obs$adj = obs$log*((obs$nu+100)/(obs$de+100))
+        obs$log = exp(obs$nu/obs$de)
+        obs$adj = log10(obs$de+2)
         obs$adj = obs$adj*obs$review_score 
         
         # filter movie based on score
@@ -120,7 +208,7 @@ scoreMatrix = function(userID,similarity){
                 meanVector = vector()
                 movieSet = obs%>%
                 filter(product_productid == movieID[i])
-                meanVector=cbind(mean(movieSet$review_score),movieID[i])
+                meanVector=cbind(mean(movieSet$adj),movieID[i])
                 rankVector = rbind(rankVector,meanVector)
         }
         rankVector = data.frame(rankVector)
@@ -148,7 +236,7 @@ scoreMatrix = function(userID,similarity){
                 meanVector = vector()
                 movieSet = obs%>%
                 filter(product_productid == movieID[i])
-                meanVector=cbind(mean(movieSet$review_score),movieID[i])
+                meanVector=cbind(mean(movieSet$adj),movieID[i])
                 new = rbind(new,meanVector)
         }
         new = data.frame(new)
@@ -156,10 +244,15 @@ scoreMatrix = function(userID,similarity){
         z = new%>%arrange(desc(score))
         
         # get the unique movie from these three conditions
-        three = c(as.vector(x$productID[1:100]),as.vector(y$productID[1:100]),as.vector(z$productID[1:100]))
+        three = c(as.vector(x$productID[1:200]),as.vector(y$productID[1:200]),as.vector(z$productID[1:200]))
         dups <- duplicated(three) == FALSE
         three <- three[dups]
-        
+        # delete movies in bad movie dataset 
+        badMovie = bad(movie)
+        three = three[! three%in%badMovie]
+        # delete all movies after 2000
+        three = delete(three,movie)
+        print(1)
         # delete all movies with key words related to the chosen movies
         #
         #
