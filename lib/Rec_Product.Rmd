@@ -1,0 +1,188 @@
+---
+title: "Recommendation Based on Product"
+author: "Yi Zhou (yz2825)"
+date: "April 12, 2016"
+output: html_document
+---
+#Introduction
+This recommendation system is based on movies' product information from user's input.  
+##1.1 Setting up the Bench
+Libraries we need along the way:
+```{r message=FALSE}
+library(rvest)
+library(stringr)
+library(tidyr)
+library(dplyr)
+library(data.table)
+```
+##1.2 Reading the Data
+```{r message=FALSE}
+cols <- c('product_productid','act_adv','aac','animation','anime',
+          'box','classics','comedy','doc','drama','edu','ex','faith','fantasy',
+          'foreign','gay','holiday','horror','indie','family','war','music',
+          'thrill','romance','sci_fi','special','sports','westerns')
+movies27 <- fread('./movies_whole.csv', select = cols) #nrow=7911684
+```
+##1.3 Data Manipulation
+```{r}
+#Filter out rows with no genres information extracted from review
+review.table = filter(movies27, act_adv != 0 | aac != 0 | animation != 0 | anime != 0 | 
+                        box != 0 | classics != 0 | comedy != 0 | doc != 0 | drama != 0 | 
+                        edu != 0 | ex != 0 | faith != 0 | fantasy != 0 | foreign != 0 | 
+                        gay != 0 | holiday != 0 | horror != 0 | indie != 0 | family != 0 | 
+                        war != 0 | music != 0 | thrill != 0 | romance != 0 | sci_fi != 0 | 
+                        special != 0 | sports != 0 | westerns != 0) #nrow=7887702
+
+#Create frequency table: Each row has a unique productID, total review count, and genres elemtns(frequency)
+#nrow(review.table.join)=252885
+review.table.join = review.table %>% 
+                    group_by(product_productid) %>% 
+                    summarize(review.count=n(),act_adv_f = mean(act_adv), aac_f = mean(aac), 
+                              animation_f = mean(animation), anime_f = mean(anime), 
+                              box_f = mean(box), classics_f = mean(classics), 
+                              comedy_f = mean(comedy), doc_f = mean(doc), drama_f = mean(drama), 
+                              edu_f = mean(edu), ex_f = mean(ex), faith_f = mean(faith), 
+                              fantasy_f = mean(fantasy), foreign_f = mean(foreign), gay_f = mean(gay), 
+                              holiday_f = mean(holiday), horror_f = mean(horror), indie_f = mean(indie), 
+                              family_f = mean(family), war_f = mean(war), music_f = mean(music), 
+                              thrill_f = mean(thrill), romance_f = mean(romance), sci_fi_f = mean(sci_fi), 
+                              special_f = mean(special), sports_f = mean(sports), westerns_f = mean(westerns))
+```
+##1.4 Amazon Genres Key Word Collection
+```{r}
+#Amazon genres
+act_adv_kw = "Action & Adventure"
+aac_kw = "African American Cinema"
+animation_kw = "Animation"
+anime_kw = "Anime"
+box_kw = "Boxed Sets"
+classics_kw = "Classics"
+comedy_kw = "Comedy"
+doc_kw = "Documentary"
+drama_kw = "Drama"
+edu_kw = "Educational"
+ex_kw = "Exercise & Fitness"
+faith_kw = "Faith & Spirituality"
+fantasy_kw = "Fantasy"
+foreign_kw = "Foreign Language & International"
+gay_kw = "Gay & Lesbian"
+holiday_kw = "Holiday & Seasonal"
+horror_kw = "Horror"
+indie_kw = "Indie & Art House"
+family_kw = "Kids & Family"
+war_kw = "Military & War"
+music_kw = "Music Videos & Concerts"
+thrill_kw = "Mystery & Thrillers"
+romance_kw = "Romance"
+sci_fi_kw = "Science Fiction"
+special_kw = "Special Interests"
+sports_kw = "Sports"
+westerns_kw = "Westerns"
+```
+#2. User's Input Process
+```{r}
+#Input testing movie list and filter to get the "favourable" movies (score >=3)
+movieList = cbind(c("B001OGWY1W","B001KZG99A","B004C3DLJ8","B0054NRPMO","B000XSEPYQ"),c(2,3,4,5,3))
+movieList = movieList[,1][movieList[,2] >= 3]
+#Create a input movie list's genres matrix
+freq_table = matrix(rep(0, 27*length(movieList)), nrow = length(movieList), ncol = 27)
+#freq_table[,1] = movieList
+for (i in 1:length(movieList)) {
+  #Get Amazon Genres from Amazon website
+  ASIN.inq = movieList[i]
+  movie1<- read_html(paste("http://www.amazon.com/exec/obidos/ASIN/",
+                      ASIN.inq, sep=""))
+  categoryList = movie1 %>% html_node("#dv-center-features div td") %>% html_text() %>% strsplit(",")
+  categoryList=lapply(categoryList, function(x) str_trim(x,side='both'))
+  
+  for (j in 1:length(categoryList[[1]])) {
+    #Get the Amazon Genres to our genres matrix
+    if (categoryList[[1]][j] == act_adv_kw) {freq_table[i,1] = 1}
+    if (categoryList[[1]][j] == aac_kw) {freq_table[i,2] = 1}
+    if (categoryList[[1]][j] == animation_kw) {freq_table[i,3] = 1}
+    if (categoryList[[1]][j] == anime_kw) {freq_table[i,4] = 1}
+    if (categoryList[[1]][j] == box_kw) {freq_table[i,5] = 1}
+    if (categoryList[[1]][j] == classics_kw) {freq_table[i,6] = 1}
+    if (categoryList[[1]][j] == comedy_kw) {freq_table[i,7] = 1}
+    if (categoryList[[1]][j] == doc_kw) {freq_table[i,8] = 1}
+    if (categoryList[[1]][j] == drama_kw) {freq_table[i,9] = 1}
+    if (categoryList[[1]][j] == edu_kw) {freq_table[i,10] = 1}
+    if (categoryList[[1]][j] == ex_kw) {freq_table[i,11] = 1}
+    if (categoryList[[1]][j] == faith_kw) {freq_table[i,12] = 1}
+    if (categoryList[[1]][j] == fantasy_kw) {freq_table[i,13] = 1}
+    if (categoryList[[1]][j] == foreign_kw) {freq_table[i,14] = 1}
+    if (categoryList[[1]][j] == gay_kw) {freq_table[i,15] = 1}
+    if (categoryList[[1]][j] == holiday_kw) {freq_table[i,16] = 1}
+    if (categoryList[[1]][j] == horror_kw) {freq_table[i,17] = 1}
+    if (categoryList[[1]][j] == indie_kw) {freq_table[i,18] = 1}
+    if (categoryList[[1]][j] == family_kw) {freq_table[i,19] = 1}
+    if (categoryList[[1]][j] == war_kw) {freq_table[i,20] = 1}
+    if (categoryList[[1]][j] == music_kw) {freq_table[i,21] = 1}
+    if (categoryList[[1]][j] == thrill_kw) {freq_table[i,22] = 1}
+    if (categoryList[[1]][j] == romance_kw) {freq_table[i,23] = 1}
+    if (categoryList[[1]][j] == sci_fi_kw) {freq_table[i,24] = 1}
+    if (categoryList[[1]][j] == special_kw) {freq_table[i,25] = 1}
+    if (categoryList[[1]][j] == sports_kw) {freq_table[i,26] = 1}
+    if (categoryList[[1]][j] == westerns_kw) {freq_table[i,27] = 1}
+  }
+}
+
+#Calculate input movies' genres element(frequency)
+input_f = colSums(freq_table) / sum(colSums(freq_table))
+```
+#3. Similarity
+```{r}
+#Pre-filter some observations
+review.table.join.filter = filter(review.table.join, act_adv_f>input_f[1]-0.1 & aac_f>input_f[1]-0.1 &
+                                    animation_f>input_f[1]-0.1 & anime_f>input_f[1]-0.1 &
+                                    box_f>input_f[1]-0.1 & classics_f>input_f[1]-0.1 & comedy_f>input_f[1]-0.1 & 
+                                    doc_f>input_f[1]-0.1 & drama_f>input_f[1]-0.1 & edu_f>input_f[1]-0.1 &
+                                    ex_f>input_f[1]-0.1 & faith_f>input_f[1]-0.1 & fantasy_f>input_f[1]-0.1 &
+                                    foreign_f>input_f[1]-0.1 & gay_f>input_f[1]-0.1 & holiday_f > input_f[1]-0.1 &
+                                    horror_f>input_f[1]-0.1 &indie_f>input_f[1]-0.1 &family_f>input_f[1]-0.1 &
+                                    war_f>input_f[1]-0.1 & music_f>input_f[1]-0.1 & thrill_f>input_f[1]-0.1 &
+                                    romance_f>input_f[1]-0.1 & sci_fi_f>input_f[1]-0.1 & special_f>input_f[1]-0.1 &
+                                    sports_f>input_f[1]-0.1 & westerns_f>input_f[1]-0.1)
+
+review = as.data.frame(review.table.join.filter)
+review.table.index = review[,1:2]
+review.table.f = review[,3:29]
+```
+
+```{r}
+trial = review.table.f[1:100,]
+similarity = matrix(,ncol=2)
+for(i in 1:dim(review.table.f)[1]){
+  a = cbind(i,as.numeric(1/dist(rbind(as.numeric(review.table.f[i,]),input_f))))
+  similarity = rbind(similarity,a) 
+}
+
+similarity <- similarity[order(similarity[,2]),]
+
+review.table.index[which.max(similarity,200),]
+```
+
+```{r}
+find_title <- function(movie_id) {
+  ASIN.inq = movie_id
+  movie1 <- html(paste("http://www.amazon.com/exec/obidos/ASIN/",ASIN.inq, sep=""))
+  title <- movie1 %>% html_node("title") %>% html_text()
+}
+final_list = vector()
+for (movie in similarity) {
+  ASIN.inq = movie
+  movie1 <- html(paste("http://www.amazon.com/exec/obidos/ASIN/",ASIN.inq, sep=""))
+  title1 <- movie1 %>% html_node("title") %>% html_text()
+  match <- substr(title,1,3)
+  while (final_list < 5) {
+
+    
+    movie2 <- 
+  }
+}
+  
+  
+  
+
+
+```
