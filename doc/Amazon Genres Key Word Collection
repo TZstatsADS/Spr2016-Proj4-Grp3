@@ -1,7 +1,7 @@
-Amazon Collecion: 'Action & Adventure','African American Cinema','Animation','Anime','Boxed Sets','Classics','Comedy','Documentary','Drama','Educational','Exercise & Fitness','Faith & Spirituality','Fantasy','Foreign Language & International','Gay & Lesbian','Holiday & Seasonal','Horror','Indie & Art House','Kids & Family','Military & War','Music Videos & Concerts','Mystery & Thrillers','Romance','Science Fiction','Special Interests','Sports','Westerns'
+#Amazon Genres - 27 in total: 
+'Action & Adventure','African American Cinema','Animation','Anime','Boxed Sets','Classics','Comedy','Documentary','Drama','Educational','Exercise & Fitness','Faith & Spirituality','Fantasy','Foreign Language & International','Gay & Lesbian','Holiday & Seasonal','Horror','Indie & Art House','Kids & Family','Military & War','Music Videos & Concerts','Mystery & Thrillers','Romance','Science Fiction','Special Interests','Sports','Westerns'
 
-Python Variable Name: 'Act_Adv','AAC','Animation','Anime','Box','Classics','Comedy','Doc','Drama','Edu','Ex','Faith','Fantasy','Foreign','Gay','Holiday','Horror','Indie','Family','War','Music','Thrill','Romance','Sci_Fi','Special','Sports','Westerns'
-
+#Python Corresponding Variable Name:
 Amazon Collection Variable Names:
 Action & Adventure = Act_Adv
 African American Cinema = AAC
