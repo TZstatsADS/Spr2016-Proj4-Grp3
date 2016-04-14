@@ -30,7 +30,8 @@ movielist = matrix(movieList,byrow = F,nrow = 5)
 # Output:Usful similar Viewer ID and their similarities
 
 ```{r}
-movie<- fread("/Users/Arsenal4ever/Desktop/moviescsv2.csv")
+cols <- c('product_productid', 'review_userid', 'review_helpfulness', 'review_score','review_time')
+movie <- fread("/Users/Arsenal4ever/Desktop/movies_whole.csv",select = cols)
 # find useful viewer
 usefuluser <-function(inputMovie){
         # find Viewer with who watched ast least two the same movie
