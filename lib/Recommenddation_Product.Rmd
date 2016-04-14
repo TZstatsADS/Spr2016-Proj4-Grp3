@@ -137,7 +137,10 @@ for (i in 1:length(movieList)) {
 #Calculate input movies' genres element(frequency)
 input_f = colSums(freq_table) / sum(colSums(freq_table))
 ```
+
 #3. Similarity
+###3.1 Pre-filter data  
+We pre-filter data based on the frequency table input, so any genres frequency smaller than 10% of the input frequency will be pre-filtered out.  
 ```{r}
 #Pre-filter some observations
 review.table.join = as.data.frame(review.table.join)
@@ -157,6 +160,8 @@ review.table.index = review[,1:2]
 review.table.f = review[,3:29]
 ```
 
+###3.2 Similarity Calculation
+The similarity calculation is based on 1/Euclidean distance.
 ```{r}
 similarity = matrix(,ncol=2)
 for(i in 1:dim(review.table.f)[1]){
@@ -170,7 +175,12 @@ index = which(is.na(as.numeric(review.table.index$product_productid)))
 similarity2 = similarity1[index,]
 #Sort the distance
 similarity3 <- similarity2[order(-similarity2[,2]),]
+```
 
+###3.3 Similarity Post-filter
+We post-filtered out the "bad" movies(bad movies definition can be found in the same folder, see readMe for more info).  
+We filter out the duplicates by assuming that if the movies ranking below has the same review counts, it's a duplicate.  
+```{r}
 #Delete the bad movies
 bad1 <- read.csv("movie_littlsuck.csv")
 bad2 <- read.csv("movie_worst.csv")
@@ -197,6 +207,9 @@ for (i in 2:nrow(final_list)) {
   }
 }
 final_list_unique = final_list[-duplicate,]
+```
+#4. Final Output
+```{r}
 #Choose the top 5 movies to recommend
 head(final_list_unique,5)
 ```
