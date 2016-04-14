@@ -18,7 +18,7 @@ In this project, we will explore relational data where the data were collected t
 
 Summary: In this project, we approaced the movie recommendation system from 2 different angels.One is to use member's information and the other is based on product information. In the end, we also found some interesting facts from the dataset. All the presentation information can be found in our output folder. 
 
-Contribution Statement: Schinria Rema Islam organized all the Amazon genres for the analysis. Yuchen Shi developed the movie recommendation system based on member information. Yanran Wang found out all the fun facts about the dataset. Yi Zhou developed the movie recommendation system based on product information and used a unpdated python script to organize the dataset.
+Contribution Statement: Schinria Rema Islam organized all the Amazon genres for the analysis. Yuchen Shi developed the movie recommendation system based on member information. Yanran Wang assisted in designing user based recommendation system and found out all the fun facts about the dataset. Yi Zhou developed the movie recommendation system based on product information and used a unpdated python script to organize the dataset.
 Schinria Rema Islam, Yuchen Shi and Yanran Wang presented the final findings.
 
 
