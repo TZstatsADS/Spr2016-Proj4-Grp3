@@ -4,7 +4,7 @@ author: "Yi Zhou (yz2825)"
 date: "April 12, 2016"
 output: html_document
 ---
-#Introduction
+#1. Introduction
 This recommendation system is based on movies' product information from user's input.  
 ##1.1 Setting up the Bench
 Libraries we need along the way:
