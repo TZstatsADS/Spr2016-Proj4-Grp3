@@ -1,0 +1,179 @@
+Amazon Collecion: 
+'Action & Adventure','African American Cinema','Animation','Anime',
+'Boxed Sets','Classics','Comedy','Documentary','Drama','Educational',
+'Exercise & Fitness','Faith & Spirituality','Fantasy',
+'Foreign Language & International','Gay & Lesbian','Holiday & Seasonal',
+'Horror','Indie & Art House','Kids & Family','Military & War',
+'Music Videos & Concerts','Mystery & Thrillers','Romance','Science Fiction',
+'Special Interests','Sports','Westerns'
+
+Python Corresponding Variable Name: 
+Action & Adventure = Act_Adv
+African American Cinema = AAC
+Animation = Animation
+Anime = Anime
+Boxed Sets = Box
+Classics = Classics
+Comedy = Comedy
+Documentary = Doc
+Drama = Drama
+Educational = Edu
+Exercise & Fitness = Ex
+Faith & Spirituality = Faith
+Fantasy = Fantasy
+Foreign Language & International = Foreign
+Gay & Lesbian = Gay
+Holiday & Seasonal = Holiday
+Horror = Horror
+Indie & Art House = Indie
+Kids & Family = Family
+Military & War = War
+Music Videos & Concerts = Music
+Mystery & Thrillers = Thrill
+Romance = Romance
+Science Fiction = Sci_Fi
+Special Interests = Special
+Sports = Sports
+Westerns = Westerns
+
+Amazon Collection and Genres:
+Action & Adventure
+'action','adventur','risk','explosi','fight','daring','dare','escap','hero','blood',
+'brother','duty','honor','violence','warrior','spy','mission','gun','gadget','danger',
+'stunt','alert','plan','dash','bustle','power','treasure','map','fear','island','journey',
+'experience','feat','venture','deed','quest','win','mishap','accomplish','maneuver','effort',
+'hazard','accident','enterprise','undertaking','voyage','expedition','experiment','speculat',
+'wager'
+
+African American Cinema
+'african','american','cinema','black','pioneer','divers','bet','communit','hero',
+'naacp','race','africa','discriminat','reggae','hip­hop','histori','preserv','stereotype',
+'slave','segregat','negro','dark','raci','ghetto','color'
+
+Animation
+'anima','cartoon','paint','illusion','figurine','computer­generated','figure','puppet',
+'pixel','creative','disney','pixar','funny','enjoy'
+
+Anime
+'anime','japan','cartoon','ghibli','studio','akira','fan','manga','artist','graphic'
+
+Boxed Sets
+'box','set','compilation','books','recording','film','package','anthology','essential',
+'never­before','discography','season','complete','series','popular','commemorat','collect',
+'pack'
+
+Classics
+'classic','all','time','old','film','memorabl','nostalgi','quote','cultur','communiti',
+'distinguish','unique','transcend','quality','recogni','break','rewatch','re­watch',
+'favorite','talent','human','timeless'
+
+Comedy
+'comedy','funny','comic','laugh','satir','humor','sketch','fancy','excite','entertain',
+'parody','mock','lightheart','pun','amuse','stand­up','satire','screwball','joke','improvise',
+'farce','sitcom','camp','fun','hilar','merry','jest','joke','gag','wit'
+
+Documentary
+'document','biograph','histori','real­world','journal','true','narrat','literary','docudrama',
+'education','nonfiction','reality','fact','opinion','fact','century','politic','personal',
+'expert','memoir','inform','ancient'
+
+Drama
+'drama','noir','crime','suspens','noir','crime','drama','serious','cynic','heavy',
+'investigat','dark','melo','erotic','goth','gang','legal','corrupt','case','abominat',
+'malfeasance','misdeed','breach','felony','law','scandal','transgress','violat','wrong',
+'delinq','deprav','rage','wick','realist','theme','alcohol','abuse','drug','addict',
+'emotion','hope','moral','dilemma','prejudice','intolera','poverty','divisi','phenomen'
+
+Educational
+'educat','inspir','youth','kids','school','book','read','learn','teens','team','message',
+'tween','teach','docu','role model','issue','icon','boy','girl','important','fascinat'
+
+Exercise & Fitness
+'exercis','fitness','fit','muscle','tone','shape','thin','abs','rock­hard','physique',
+'weight','lean','train','hard','workout','pump','inspir','body','build','gym','rat',
+'at­home','iron','dance','sequence','cardio','aerobic','strength'
+
+Faith & Spirituality
+'faith','spiritual','religio','god','jesus','church','christ','jew','islam','muslim',
+'buddhis','believe','command','noah','hindi','hindu','angel','life','apostle','pray',
+'strength','devil','passion','dogmas'
+
+Fantasy
+'fantasy','magic','myth','supernatural','folk','exotic','world','wonder','escap',
+'extraordinary','sword','sorcer','ring','nether','fairy­tale','legend','imagin','dream',
+'hallucinat','mystic','power','superhuman','force','fly','dragon','bizarre','whim','prince',
+'angel','gnome','dwarve','elf','elves','marvel'
+
+Foreign Language & International
+'foreign','language','international','country','non­english','dialogue','caption','europe',
+'africa','america','asia','arabi','hebrew','french','itali','italy','aborigin','territor',
+'japan','mayan','bollywood','spanish','palestin','israel','canne','mandarin','hindi',
+'portug','bengal','russia','turk','canton','thai','gujarati','punjabi','german','korea',
+'dutch','tamil','persia','urdu','polish','pashto','jin','wu','telugu','marathi','hausa',
+'min nan','kannada','xiang'
+
+Gay & Lesbian
+'gay','lesbian','love','bisexual','transgend','pride','relationship','desire','anti­gay',
+'homosexual','orthodox','intimate','lgbt','fabulous','sex','feeling','prostitute','com',
+'out','closet','romanc'
+
+Holiday & Seasonal
+'holiday','season','santa','christmas','snow','rain','spring','summer','fall','halloween',
+'easter','day','eve','hanukkah','carol','charity','reindeer','spirit','timeless','child',
+'family','light','greeting','home','new year'
+
+Horror
+'horror','kill','scream','monster','torture','terror','demon','shark','unsettl','dread',
+'fright','panic','alarm','fear','terrify','shock','captiv','macabre','supernatural','unknown',
+'ghost','extraterrestrial','vampire','werewolve','gore','vicious','evil','witch','zombie',
+'cannibal','psychopath','serial'
+
+Indie & Art House
+'indie','art','house','serious','independent','niche','unconventional','symbol','thought',
+'dream','motivat','festival','specialty','arthouse','cinema','deviat','identity','issue'
+
+Kids & Family
+'kid','family','friendl','general','paint','young','illusion','age','magic','audience',
+'appropriate','fairy','child','home','favorite','kid','baby','pleas','disney','cute',
+'miracle','goofy','rated­g','happily'
+
+Military & War
+'milita','war','hero','blood','honor','operat','battle','bloodshed','combat','conflict',
+'fight','hostil','strike','struggle','polic','army','martial','aggress','arm','civil',
+'soldier','force','troop','aircraft','ally','armor','attack','bomb','brigade','cadet',
+'captain','capture','cavalry','command','corps','crew','conquest','defeat','enlist','fleet',
+'grenade','guerrilla','gun','headquarters','infantry','invade','machete','medal','missile',
+'navy','offense','parachute','peace','platoon','pentagon','rank','recruit','veteran',
+'tactic','sniper','salute'
+
+Music Videos & Concerts
+'music','video','concert','danc','production','stage','broadway','theater','song','show',
+'choreo','sing','orchestra','sound','vocal','costume','number','rock','disco','classical',
+'cappella','instrument'
+
+Mystery & Thrillers
+'myster','thriller','detect','evil','puzzle','police','cruel','suspens','secre','riddle',
+'crypt','perplex','tease','whodunit','crim','twist','psycho','fascinat','mind','trap',
+'accident','investig','thief','disappear','intense','disturb','horrify','kill','murder',
+'truth','discover','tragedy'
+
+Romance
+'romanc','romant','lov','heart','triangle','passion','emotion','sex','relation','affection',
+'date','marri','sentiment','friends','chick','cute','feel','match','interest','beaut','like',
+'duel','boyfriend','girlfriend','husband','wife','dating','couple'
+
+Science Fiction
+'science','fiction','sci­fi','extraterrestrial','alien','space','robot','psycho','planet',
+'technolog','extrasensory','perception','time','travel','futur','craft','cyborg',
+'interstellar','universe','parallel','life'
+
+Special Interests
+'special','interest','specific','hobby','unique'
+
+Sports
+'sport','team','football','baseball','hockey','soccer','coach','college','game','athlete',
+'ESPN','quarterback','cheerlead','basketball','skating','NFL','NBA','rival','score','goal'
+
+Westerns
+'west','american','old','cowboy','revolve','rifle','horse','boot','native','bounty','hunter',
+'outlaw','settler','town','spur','cavalry','ranch','sling','saloon','wild'
