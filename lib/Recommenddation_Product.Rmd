@@ -79,7 +79,7 @@ special_kw = "Special Interests"
 sports_kw = "Sports"
 westerns_kw = "Westerns"
 ```
-#2. User's Input Process
+#2. User's Input Processing
 ```{r}
 #Input testing movie list and filter to get the "favourable" movies (score >=3)
 movieList = cbind(c("B003QTWR08","B0055B7K7A","B00AHSLU2C","B0046B8GEQ","B004C3DLJ8","B001OGWY1W","B001KZG99A","B005ZB91KY","B003KJF2WE","B002EDH0FE"),c(4,5,4,5,3,5,4,3,3,4))
@@ -103,7 +103,7 @@ for (i in 1:length(movieList)) {
   categoryList=lapply(categoryList, function(x) str_trim(x,side='both'))
   print(categoryList)
   for (j in 1:length(categoryList[[1]])) {
-    #Get the Amazon Genres to our genres matrix
+    #Calculate Amazon Genres frequency
     if (categoryList[[1]][j] == act_adv_kw) {freq_table[i,1] = 1}
     if (categoryList[[1]][j] == aac_kw) {freq_table[i,2] = 1}
     if (categoryList[[1]][j] == animation_kw) {freq_table[i,3] = 1}
@@ -134,7 +134,7 @@ for (i in 1:length(movieList)) {
   }
 }
 
-#Calculate input movies' genres element(frequency)
+#Calculate input movies' genres element(mean frequency) for comparisons (calculate distance later)
 input_f = colSums(freq_table) / sum(colSums(freq_table))
 ```
 
