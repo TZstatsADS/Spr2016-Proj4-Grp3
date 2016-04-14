@@ -19,7 +19,7 @@ The criteria for defining "bad" movies are based on the pattern of the customenr
 
 One more interesting pattern that we found is the shape of "F". There are some movie whose ratings follow the shape of "F", which means that most people give 5 and 4, however, they receive pretty low rating of freshness on rottentomates. We decide to keep these kind of movies since many blockbusters nowadays do receive low rating on rottentomates but also interest many movie seekers at the same time.
 
-The R script Getridofbadmovies.R is the code for filtering those "bad" movies. 
+The R script GetRidOfBadMovies.R is the code for filtering those "bad" movies. 
 
 
 ### 3. Recommendation System based on Member Information
