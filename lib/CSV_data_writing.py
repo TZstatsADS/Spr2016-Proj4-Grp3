@@ -16,6 +16,7 @@ def count_cat(category,review):
         n = n + review.count(word)
     return(n)
 
+#Columns to write
 cols = ['product_productid', 'review_userid', 'review_helpfulness', 
         'review_score','review_time','act_adv','aac','animation','anime',
         'box','classics','comedy','coc','drama','edu','ex','faith','fantasy',
@@ -52,7 +53,7 @@ sports = ['sport','team','football','baseball','hockey','soccer','coach','colleg
 westerns = ['west','american','old','cowboy','revolve','rifle','horse','boot','native','bounty','hunter','outlaw','settler','town','spur','cavalry','ranch','sling','saloon','wild']
 
 
-f = open('./moviestrial.csv', 'w')
+f = open('./movies_whole.csv', 'w')
 w = csv.writer(f)
 w.writerow(cols)
 
@@ -64,6 +65,7 @@ with open('./movies.txt', encoding="utf-8", errors="surrogateescape") as infile:
         if line == "" and 'review_text' in doc:
             print(i)
             i = i + 1
+            #Check how many key words in each genres have been detected in the review+summary part
             review=doc['review_summary'].lower()+' '+doc['review_text'].lower()
             act_adv_n = count_cat(act_adv,review)
             aac_n = count_cat(aac,review)
@@ -94,7 +96,7 @@ with open('./movies.txt', encoding="utf-8", errors="surrogateescape") as infile:
             westerns_n = count_cat(westerns,review)
 
             total = (act_adv_n+aac_n+animation_n+anime_n+box_n+classics_n+comedy_n+doc_n+drama_n+edu_n+ex_n+faith_n+fantasy_n+foreign_n+gay_n+holiday_n+horror_n+indie_n+family_n+war_n+music_n+thrill_n+romance_n+sci_fi_n+special_n+sports_n+westerns_n)
-            
+            #If no key word detected, set to 0
             if total == 0:
                 doc['act_adv'] = 0
                 doc['aac'] = 0
@@ -123,6 +125,7 @@ with open('./movies.txt', encoding="utf-8", errors="surrogateescape") as infile:
                 doc['special'] = 0
                 doc['sports'] = 0
                 doc['westerns'] = 0
+            #If key word detected, calculate the genres frequency(element) in a review.
             else:
                 doc['act_adv'] = round(act_adv_n / total,4)
                 doc['aac'] = round(aac_n / total,4)
