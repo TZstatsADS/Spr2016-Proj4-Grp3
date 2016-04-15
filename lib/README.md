@@ -7,7 +7,8 @@ The lib directory contains various files with function definitions (but only fun
 To reproduce our analysis, the following steps should be followed:
 
 ### 1. CSV_data_writing.py
-The original data set can be downloaded here: http://snap.stanford.edu/data/web-Movies.html
+The original data set can be downloaded here: http://snap.stanford.edu/data/web-Movies.html  
+
 By the "CSV_data_writing.py" script, we can process the original txt file to a csv file named "movies_whole.csv", which is easier for R to read.
 
 ### 2. Bad Movie List
@@ -23,7 +24,9 @@ The R script GetRidOfBadMovies.R is the code for getting those "bad" movies. Onc
 
 
 ### 3. Recommendation System based on Member Information
+The Recommendation_MemberInfo.Rmd is used to recommend movies based on the similarity of the user's movie input and other existing member's reiview preference history.
+
 
 ### 4. Recommenddation_Product.Rmd
-The Recommenddation_Product.Rmd is used to recommend movies by product information.
+The Recommendation_Product.Rmd is used to recommend movies based on the similarity of the user's favourable movie genres elment and the other existing movies' genres elements extracted from each review.
 By inputting user's preferred movie under "2. User's Input Processing", it will output five movies to recommend.
