@@ -16,8 +16,7 @@ The R script GetRidOfBadMovies.R is the code for getting those "bad" movies. Onc
 
 
 ### 3. Recommendation System based on Member Information
-The Recommendation_MemberInfo.Rmd is used to recommend movies based on the similarity of the user's movie input and other existing member's reiview preference history.
-
+The Recommendation_MemberInfo.Rmd is used to recommend movies based on the similar users' review history. This method usually works fine with input containing more than 10 movies. Based on the test results, this method catches users' taste well. 
 
 ### 4. Recommenddation_Product.Rmd
 The Recommendation_Product.Rmd is used to recommend movies based on the similarity of the user's favourable movie genres elment and the other existing movies' genres elements extracted from each review.
