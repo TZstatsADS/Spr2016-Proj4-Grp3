@@ -1,5 +1,5 @@
 # Project: Movies
 ### Output folder
 
-The output directory contains analysis output, processed datasets, logs, or other processed things.
+The output directory contains slides for final presentation.
 
